@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1e4861"
+
+    tools:context=".login_fragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_text"
+        android:textSize="23sp"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:textColor="#51e1c0"
+        android:textStyle="bold"
+        android:text="Login to your acount" />
+    <View
+        android:layout_height="2dp"
+        android:layout_width="80dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/login_text"
+        android:background="#38bebf"
+        android:id="@+id/red_line"
+        android:layout_marginLeft="20dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/email_text"
+        android:background="@drawable/edittext_shape"
+        android:layout_below="@id/red_line"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:paddingVertical="14dp"
+        android:hint="Email Address"
+        android:textColor="#dee6e9"
+        android:inputType="textEmailAddress"
+        android:textSize="18sp"
+        android:textColorHint="#dee6e9"
+        android:paddingHorizontal="10dp"
+        android:layout_marginRight="20dp"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/pass_text"
+        android:background="@drawable/edittext_shape"
+        android:layout_below="@id/email_text"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:paddingVertical="14dp"
+        android:hint="Password"
+        android:textColor="#dee6e9"
+        android:inputType="textPassword"
+        android:textSize="18sp"
+        android:textColorHint="#dee6e9"
+        android:paddingHorizontal="10dp"
+        android:layout_marginRight="20dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_btn"
+        android:background="@drawable/loginbtn_shape"
+        android:layout_below="@id/pass_text"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:textColor="#fafbff"
+        android:textSize="18sp"
+        android:text="Login"
+        android:layout_marginRight="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_btn"
+        android:layout_marginTop="30dp"
+        android:text="Create new account"
+        android:textColor="#93a4ae"
+        android:id="@+id/already"
+        android:textSize="19sp"
+        android:layout_centerHorizontal="true"
+        />
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progress"
+        android:layout_below="@+id/already"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+</RelativeLayout>
