@@ -12,13 +12,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NotePage extends AppCompatActivity {
 
@@ -28,8 +33,9 @@ public class NotePage extends AppCompatActivity {
     Note note;
     ProgressBar progress;
     FirebaseFirestore db;
-
+    Calendar c;
     boolean isnew = false;
+    SimpleDateFormat sdf;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,39 +44,72 @@ public class NotePage extends AppCompatActivity {
         init();
         save.setOnClickListener(e->{
 
-            if(note.getTitle().equals(title_edit.getText().toString())   && note.getDescription().equals(desc_edit.getText().toString())){
-                //Toast.makeText(this, "تغییر نداره", Toast.LENGTH_SHORT).show();
-                    finish();
+            String title = title_edit.getText().toString().trim();
+            String desc = desc_edit.getText().toString().trim();
+            if(title.matches("") || desc.matches("")){
+                Toast.makeText(getApplicationContext(), "Enter some characters", Toast.LENGTH_SHORT).show();
             }else{
-                progress.setVisibility(View.VISIBLE);
-               // Toast.makeText(this, "تغییر داده شده است", Toast.LENGTH_SHORT).show();
-                UpdateNote();
+                if(isnew){
+                    progress.setVisibility(View.VISIBLE);
+                    CreateNote();
+                }else {
+                    if(note.getTitle().equals(title_edit.getText().toString())   && note.getDescription().equals(desc_edit.getText().toString())){
+
+                        finish();
+                    }else{
+                        progress.setVisibility(View.VISIBLE);
+
+                        UpdateNote();
+                    }
+                }
             }
+
         });
 
     }
+    private void CreateNote(){
+        c = Calendar.getInstance();
+        sdf = new SimpleDateFormat("dd,MM,YYYY");
+        String strDate = sdf.format(c.getTime());
+
+        Map<String, Object> newContact = new HashMap<>();
+        newContact.put("title", title_edit.getText().toString());
+        newContact.put("description", desc_edit.getText().toString());
+        newContact.put("userid", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        newContact.put("date", strDate);
+        db.collection("notes").add(newContact).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                Toast.makeText(getApplicationContext(), "Note saved",
+                        Toast.LENGTH_SHORT).show();
+                progress.setVisibility(View.INVISIBLE);
+                finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "ERROR" +e.toString(),
+                        Toast.LENGTH_SHORT).show();
+                progress.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
     private  void UpdateNote(){
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd,MM,YYYY");
+         c = Calendar.getInstance();
+         sdf = new SimpleDateFormat("dd,MM,YYYY");
         String strDate = sdf.format(c.getTime());
        DocumentReference doc = db.collection("notes").document(note.getId());
        note.setTitle(title_edit.getText().toString());
        note.setDescription(desc_edit.getText().toString());
        doc.update("title",note.getTitle());
        doc.update("description",note.getDescription());
-       doc.update("date",strDate).addOnSuccessListener(new OnSuccessListener<Void>() {
-           @Override
-           public void onSuccess(Void aVoid) {
-               progress.setVisibility(View.INVISIBLE);
-               Toast.makeText(getApplicationContext(), "Note Updated", Toast.LENGTH_LONG).show();
-           }
-       }).addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception e) {
-               progress.setVisibility(View.INVISIBLE);
-               Toast.makeText(getApplicationContext(), "error: "+e.getMessage(), Toast.LENGTH_LONG).show();
+       doc.update("date",strDate).addOnSuccessListener(aVoid -> {
+           progress.setVisibility(View.INVISIBLE);
+           Toast.makeText(getApplicationContext(), "Note Updated", Toast.LENGTH_LONG).show();
+       }).addOnFailureListener(e -> {
+           progress.setVisibility(View.INVISIBLE);
+           Toast.makeText(getApplicationContext(), "error: "+e.getMessage(), Toast.LENGTH_LONG).show();
 
-           }
        });
        desc_edit.clearFocus();
        title_edit.clearFocus();
@@ -84,13 +123,15 @@ public class NotePage extends AppCompatActivity {
         title_edit = findViewById(R.id.title_edit);
         desc_edit = findViewById(R.id.desc_edit);
         progress.setVisibility(View.INVISIBLE);
-        Bundle data = getIntent().getExtras();
-        if(data.containsKey("note")){
+        if(getIntent().hasExtra("note")){
+            Bundle data = getIntent().getExtras();
+
             note = (Note) data.getParcelable("note");
             title_edit.setText(note.getTitle());
             desc_edit.setText(note.getDescription());
             date.setText(note.getDate());
         }else{
+            isnew=true;
             note = new Note();
         }
 

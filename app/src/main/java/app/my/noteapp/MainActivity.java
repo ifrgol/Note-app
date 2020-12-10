@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
             if(FirebaseAuth.getInstance().getCurrentUser()!=null){
                 Intent i = new Intent(this,Notelist_Activity.class);
                 startActivity(i);
+                finish();
             }
     }
 

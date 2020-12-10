@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,30 +39,36 @@ public class Notelist_Activity extends AppCompatActivity {
     RecyclerView rec;
     LinearLayoutManager linearLayoutManager;
     private FirestoreRecyclerAdapter adapter;
-
+    ImageView exit;
+    TextView empty;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notelist);
-        db = FirebaseFirestore.getInstance();
 
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd,MM,YYYY");
-        String strDate = sdf.format(c.getTime());
-        rec = findViewById(R.id.rec);
         init();
 
         ReadData();
+
+        exit.setOnClickListener(e->{
+            OnLogout();
+        });
     }
 
     private void init(){
+        db = FirebaseFirestore.getInstance();
+        exit = findViewById(R.id.exit);
+
+
+        rec = findViewById(R.id.rec);
+        empty = findViewById(R.id.empty);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         rec.setLayoutManager(linearLayoutManager);
 
     }
     private void ReadData(){
 
-        Query query = db.collection("notes");
+        Query query = db.collection("notes").whereEqualTo("userid",FirebaseAuth.getInstance().getCurrentUser().getUid());
         FirestoreRecyclerOptions<Note> response = new FirestoreRecyclerOptions.Builder<Note>()
                 .setQuery(query, Note.class)
                 .build();
@@ -70,6 +77,7 @@ public class Notelist_Activity extends AppCompatActivity {
             @Override
             public void onBindViewHolder(FriendsHolder holder, int position, Note model) {
                // progressBar.setVisibility(View.GONE);
+                empty.setVisibility(View.INVISIBLE);
                 holder.textName.setText(model.getTitle());
                 holder.date.setText(model.getDate());
                 holder.desc.setText(model.getDescription());
@@ -78,9 +86,12 @@ public class Notelist_Activity extends AppCompatActivity {
                 holder.itemView.setOnClickListener(v -> {
                     Intent i = new Intent(getBaseContext(),NotePage.class);
                     i.putExtra("note",model);
-                  //  i.putExtra("id",response.getSnapshots().getSnapshot(position).getId());
 
                     startActivity(i);
+                });
+
+                holder.delete.setOnClickListener(e->{
+                    DeleteNote(model.getId());
                 });
             }
 
@@ -102,83 +113,63 @@ public class Notelist_Activity extends AppCompatActivity {
         rec.setAdapter(adapter);
     }
 
+    public void onCreate(View view) {
+        Intent i = new Intent(this,NotePage.class);
+        startActivity(i);
+    }
+
     public class FriendsHolder extends RecyclerView.ViewHolder {
         TextView textName;
         TextView date;
         TextView desc;
+        ImageView delete;
 
         public FriendsHolder(View itemView) {
             super(itemView);
             textName = itemView.findViewById(R.id.title);
             date = itemView.findViewById(R.id.date);
             desc = itemView.findViewById(R.id.desc);
+            delete = itemView.findViewById(R.id.delete);
 
         }
     }
 
-//        db.collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                date_text.setText(""+task.getResult().size());
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//
-//            }
-//        });
+public void DeleteNote(String id){
+    db.collection("notes").document(id)
+            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+        @Override
+        public void onSuccess(Void aVoid) {
+
+            Toast.makeText(getApplicationContext(), "Note deleted !",
+                    Toast.LENGTH_SHORT).show();
+
+        }
+    });
+}
 @Override
 public void onStart() {
     super.onStart();
+    empty.setVisibility(View.VISIBLE);
     adapter.startListening();
+
+
 }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 
     @Override
     public void onStop() {
         super.onStop();
         adapter.stopListening();
     }
-    private void addNewContact(){
 
-        Map<String, Object> newContact = new HashMap<>();
-        newContact.put("title", "test");
-        newContact.put("description", "sdsd");
-        newContact.put("userid", "332");
-        newContact.put("date", "32334");
-       db.collection("notes").add(newContact).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-           @Override
-           public void onComplete(@NonNull Task<DocumentReference> task) {
-               Toast.makeText(Notelist_Activity.this, "User Registered",
-                               Toast.LENGTH_SHORT).show();
-           }
-       }).addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception e) {
-               Toast.makeText(Notelist_Activity.this, "ERROR" +e.toString(),
-                               Toast.LENGTH_SHORT).show();
-           }
-       });
-//        db.collection("notes").add(newContact)
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        Toast.makeText(Notelist_Activity.this, "User Registered",
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Toast.makeText(Notelist_Activity.this, "ERROR" +e.toString(),
-//                                Toast.LENGTH_SHORT).show();
-//                        Log.d("TAG", e.toString());
-//                    }
-//                });
-    }
 
-    public void OnLogout(View view) {
-        addNewContact();
-//        FirebaseAuth.getInstance().signOut();
-//        finish();
+    public void OnLogout() {
+
+        FirebaseAuth.getInstance().signOut();
+        finish();
     }
 }

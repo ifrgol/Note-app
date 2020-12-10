@@ -95,7 +95,12 @@ public class signup_fragment extends Fragment {
             public void onClick(View view) {
                 progress.setVisibility(View.VISIBLE);
 
-                signup(email_text.getText().toString(),pass_text.getText().toString());
+                if(pass_text.getText().length()<6){
+                    Toast.makeText(context, "Password is to short", Toast.LENGTH_SHORT).show();
+                }else{
+                    signup(email_text.getText().toString(),pass_text.getText().toString());
+
+                }
             }
         });
         already.setOnClickListener(new View.OnClickListener() {
@@ -124,7 +129,11 @@ public class signup_fragment extends Fragment {
                 progress.setVisibility(View.INVISIBLE);
 
                 Intent i = new Intent(context,Notelist_Activity.class);
-                startActivity(i);            }
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                startActivity(i);
+
+            }
         })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override

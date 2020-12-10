@@ -18,6 +18,16 @@
         android:layout_below="@+id/tool"
         android:layout_marginTop="10dp"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your list is empty!"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="20sp"
+        android:id="@+id/empty"/>
     <ImageView
         android:layout_width="35dp"
         android:layout_height="35dp"
@@ -27,5 +37,6 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
+        android:onClick="onCreate"
         android:layout_alignParentBottom="true"/>
 </RelativeLayout>

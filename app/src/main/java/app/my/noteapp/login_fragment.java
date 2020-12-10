@@ -118,6 +118,8 @@ public class login_fragment extends Fragment {
                 progress.setVisibility(View.INVISIBLE);
 
                 Intent i = new Intent(context,Notelist_Activity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                 startActivity(i);
             }
         })
