@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -70,11 +71,16 @@ public class Notelist_Activity extends AppCompatActivity {
             public void onBindViewHolder(FriendsHolder holder, int position, Note model) {
                // progressBar.setVisibility(View.GONE);
                 holder.textName.setText(model.getTitle());
+                holder.date.setText(model.getDate());
+                holder.desc.setText(model.getDescription());
 
-
+                model.setId(response.getSnapshots().getSnapshot(position).getId());
                 holder.itemView.setOnClickListener(v -> {
-                    Snackbar.make(rec, model.getTitle(), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Intent i = new Intent(getBaseContext(),NotePage.class);
+                    i.putExtra("note",model);
+                  //  i.putExtra("id",response.getSnapshots().getSnapshot(position).getId());
+
+                    startActivity(i);
                 });
             }
 
@@ -98,10 +104,14 @@ public class Notelist_Activity extends AppCompatActivity {
 
     public class FriendsHolder extends RecyclerView.ViewHolder {
         TextView textName;
+        TextView date;
+        TextView desc;
 
         public FriendsHolder(View itemView) {
             super(itemView);
             textName = itemView.findViewById(R.id.title);
+            date = itemView.findViewById(R.id.date);
+            desc = itemView.findViewById(R.id.desc);
 
         }
     }
